@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import fetch from "isomorphic-fetch";
+
 import "./App.css";
 import Button from "../Button";
 import Table from "../Table";
@@ -15,7 +17,16 @@ import {
   initAddItem
 } from "../../constants";
 
+
 let lastObjectId = 1;
+const Loading = () => <div className="fa-3x"><i className="fas fa-spinner fa-spin"></i></div>;
+
+const withLoading = (Component) => ({ isLoading, ...rest }) =>
+  isLoading
+    ? <Loading />
+    : <Component { ...rest } />
+
+const ButtonWithLoading = withLoading(Button);
 
 /**
  * app组件
@@ -29,7 +40,10 @@ class App extends Component {
       searchKey: "",
       searchTerm: DEFAULT_QUERY,
       addedItem: { ...initAddItem },
-      error: null
+      error: null,
+      isLoading: false,
+      sortKey: 'NONE',
+      isSortReverse: false,
     };
     this.needsToSearchTopStories = this.needsToSearchTopStories.bind(this);
     this.setSearchTopStories = this.setSearchTopStories.bind(this);
@@ -39,6 +53,11 @@ class App extends Component {
     this.onDismiss = this.onDismiss.bind(this);
     this.inputChange = this.inputChange.bind(this);
     this.submit = this.submit.bind(this);
+    this.onSort = this.onSort.bind(this);
+  }
+  onSort(sortKey) {
+    const isSortReverse = this.state.sortKey === sortKey && !this.state.isSortReverse;
+      this.setState({ sortKey, isSortReverse });
   }
   needsToSearchTopStories(searchTerm) {
     return !this.state.results[searchTerm];
@@ -65,11 +84,13 @@ class App extends Component {
       results: {
         ...results,
         [searchKey]: { hits: updatedHits, page }
-      }
+      },
+      isLoading: false
     });
   }
 
   fetchSearchTopStories(searchTerm, page = 0) {
+    this.setState({ isLoading: true });
     fetch(
       `${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`
     )
@@ -136,7 +157,7 @@ class App extends Component {
     this.setState({ searchTerm: event.target.value });
   }
   render() {
-    const { searchTerm, results, searchKey, addedItem, error } = this.state;
+    const { searchTerm, results, searchKey, addedItem, error, isLoading, sortKey, isSortReverse } = this.state;
 
     const page =
       (results && results[searchKey] && results[searchKey].page) || 0;
@@ -160,14 +181,19 @@ class App extends Component {
             <p>Something went wrong.</p>
           </div>
         ) : (
-          <Table list={list} onDismiss={this.onDismiss} />
+          <Table list={list} 
+                 onDismiss={this.onDismiss} 
+                 sortKey={sortKey}
+                 isSortReverse={isSortReverse}
+                 onSort={this.onSort}
+          />
         )}
         <div className="interactions">
-          <Button
-            onClick={() => this.fetchSearchTopStories(searchKey, page + 1)}
-          >
+        <ButtonWithLoading
+            isLoading={isLoading}
+            onClick={() => this.fetchSearchTopStories(searchKey, page + 1)}>
             More
-          </Button>
+          </ButtonWithLoading>
         </div>
         <Form
           author={addedItem.author}
@@ -182,3 +208,4 @@ class App extends Component {
 }
 
 export default App;
+export { Button, Search, Table };
