@@ -17,16 +17,30 @@ import {
   initAddItem
 } from "../../constants";
 
-
 let lastObjectId = 1;
-const Loading = () => <div className="fa-3x"><i className="fas fa-spinner fa-spin"></i></div>;
+const Loading = () => (
+  <div className="fa-3x">
+    <i className="fas fa-spinner fa-spin" />
+  </div>
+);
 
-const withLoading = (Component) => ({ isLoading, ...rest }) =>
-  isLoading
-    ? <Loading />
-    : <Component { ...rest } />
+const withLoading = Component => ({ isLoading, ...rest }) =>
+  isLoading ? <Loading /> : <Component {...rest} />;
 
 const ButtonWithLoading = withLoading(Button);
+
+const updateSearchTopStoriesState = (hits, page) => prevState => {
+  const { searchKey, results } = prevState;
+  const oldHits = results && results[searchKey] ? results[searchKey].hits : [];
+  const updatedHits = [...oldHits, ...hits];
+  return {
+    results: {
+      ...results,
+      [searchKey]: { hits: updatedHits, page }
+    },
+    isLoading: false
+  };
+};
 
 /**
  * app组件
@@ -42,8 +56,8 @@ class App extends Component {
       addedItem: { ...initAddItem },
       error: null,
       isLoading: false,
-      sortKey: 'NONE',
-      isSortReverse: false,
+      sortKey: "NONE",
+      isSortReverse: false
     };
     this.needsToSearchTopStories = this.needsToSearchTopStories.bind(this);
     this.setSearchTopStories = this.setSearchTopStories.bind(this);
@@ -56,8 +70,9 @@ class App extends Component {
     this.onSort = this.onSort.bind(this);
   }
   onSort(sortKey) {
-    const isSortReverse = this.state.sortKey === sortKey && !this.state.isSortReverse;
-      this.setState({ sortKey, isSortReverse });
+    const isSortReverse =
+      this.state.sortKey === sortKey && !this.state.isSortReverse;
+    this.setState({ sortKey, isSortReverse });
   }
   needsToSearchTopStories(searchTerm) {
     return !this.state.results[searchTerm];
@@ -71,22 +86,10 @@ class App extends Component {
     }
     event.preventDefault();
   }
+
   setSearchTopStories(result) {
     const { hits, page } = result;
-    const { searchKey, results } = this.state;
-
-    const oldHits =
-      results && results[searchKey] ? results[searchKey].hits : [];
-
-    const updatedHits = [...oldHits, ...hits];
-
-    this.setState({
-      results: {
-        ...results,
-        [searchKey]: { hits: updatedHits, page }
-      },
-      isLoading: false
-    });
+    this.setState(updateSearchTopStoriesState(hits, page));
   }
 
   fetchSearchTopStories(searchTerm, page = 0) {
@@ -157,7 +160,16 @@ class App extends Component {
     this.setState({ searchTerm: event.target.value });
   }
   render() {
-    const { searchTerm, results, searchKey, addedItem, error, isLoading, sortKey, isSortReverse } = this.state;
+    const {
+      searchTerm,
+      results,
+      searchKey,
+      addedItem,
+      error,
+      isLoading,
+      sortKey,
+      isSortReverse
+    } = this.state;
 
     const page =
       (results && results[searchKey] && results[searchKey].page) || 0;
@@ -181,17 +193,19 @@ class App extends Component {
             <p>Something went wrong.</p>
           </div>
         ) : (
-          <Table list={list} 
-                 onDismiss={this.onDismiss} 
-                 sortKey={sortKey}
-                 isSortReverse={isSortReverse}
-                 onSort={this.onSort}
+          <Table
+            list={list}
+            onDismiss={this.onDismiss}
+            sortKey={sortKey}
+            isSortReverse={isSortReverse}
+            onSort={this.onSort}
           />
         )}
         <div className="interactions">
-        <ButtonWithLoading
+          <ButtonWithLoading
             isLoading={isLoading}
-            onClick={() => this.fetchSearchTopStories(searchKey, page + 1)}>
+            onClick={() => this.fetchSearchTopStories(searchKey, page + 1)}
+          >
             More
           </ButtonWithLoading>
         </div>
