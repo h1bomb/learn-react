@@ -68,7 +68,7 @@ const Table = ({ list, onDismiss, sortKey, onSort, isSortReverse }) => {
                 onClick={() => onDismiss(item.objectID)}
                 className="button-inline"
               >
-                Delete
+                Dismiss
               </Button>
             </span>
           </div>
