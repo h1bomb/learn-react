@@ -22,17 +22,17 @@ let lastObjectId = 1;
 class App extends Component {
   constructor(props) {
     super(props);
-    this.onSearchChange = this.onSearchChange.bind(this);
-    this.onSearchSubmit = this.onSearchSubmit.bind(this);
-    this.onDismiss = this.onDismiss.bind(this);
-    this.inputChange = this.inputChange.bind(this);
-    this.submit = this.submit.bind(this);
-    this.onSort = this.onSort.bind(this);
-    this.loadMore = this.loadMore.bind(this);
+    this.onSearchChange = this.onSearchChange.bind(this); // 搜索输入
+    this.onSearchSubmit = this.onSearchSubmit.bind(this); // 搜索提交
+    this.onDismiss = this.onDismiss.bind(this); // 移除一项
+    this.inputChange = this.inputChange.bind(this); // 添加输入
+    this.submit = this.submit.bind(this); // 添加提交
+    this.onSort = this.onSort.bind(this); // 排序
+    this.loadMore = this.loadMore.bind(this); // 加载更多
   }
   onSort(sortKey) {
-    const {dispatch} = this.props;
-    dispatch(sort(sortKey))
+    const { dispatch } = this.props;
+    dispatch(sort(sortKey));
   }
 
   onSearchSubmit(event) {

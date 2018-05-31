@@ -2,6 +2,9 @@ import React from "react";
 import Button from "../Button";
 import { sortBy } from "lodash";
 
+/**
+ * 排序
+ */
 const SORTS = {
   NONE: list => list,
   TITLE: list => sortBy(list, "title"),
@@ -9,6 +12,11 @@ const SORTS = {
   COMMENTS: list => sortBy(list, "num_comments").reverse(),
   POINTS: list => sortBy(list, "points").reverse()
 };
+
+/**
+ * 排序设置
+ * @param {*} param0 
+ */
 const Sort = ({ sortKey, activeSortKey, onSort, children }) => {
   const sortClass = ["button-inline"];
 

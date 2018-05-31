@@ -1,6 +1,6 @@
 import {
     ON_DISMISS,
-    SET_SEARCH_KET,
+    SET_SEARCH_KEY,
     LOAD_DATA,
     ADD_DATA,
     SET_ADD_DATA,
@@ -59,7 +59,7 @@ const rootReducer = (state = {
             }
         case ON_DISMISS:
             return dismiss(state, action.id);
-        case SET_SEARCH_KET:
+        case SET_SEARCH_KEY:
             return {
                 ...state,
                 searchKey: action.key
