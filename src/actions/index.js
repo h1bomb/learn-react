@@ -55,6 +55,7 @@ export const loadData = json => ({
 
 export const queryData = (key, page = 1) => (dispatch, getState) => {
     dispatch(loading());
+    dispatch(setSearchKey(key));
     fetch(
             `${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${key}&${PARAM_PAGE}${page}&${PARAM_HPP}${DEFAULT_HPP}`
         )

@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import {
+  DEFAULT_QUERY
+} from '../../constants';
+import {
   onDismiss,
   setSearchKey,
   queryData,
@@ -36,8 +39,8 @@ class App extends Component {
   }
 
   onSearchSubmit(event) {
-    const { dispatch, searchKey } = this.props;
-
+    const { searchKey, dispatch } = this.props;
+    this.props.history.push(`/${searchKey}`);
     dispatch(queryData(searchKey));
     event.preventDefault();
   }
@@ -48,8 +51,9 @@ class App extends Component {
   }
 
   componentDidMount() {
-    const { dispatch, searchKey } = this.props;
-    dispatch(queryData(searchKey));
+    const { key } = this.props.match.params;
+    const { dispatch } = this.props;
+    dispatch(queryData(key||DEFAULT_QUERY));
   }
   submit() {
     const { dispatch, addedItem } = this.props;
@@ -133,6 +137,5 @@ class App extends Component {
 }
 
 export default connect(state => {
-  console.log(state);
   return state;
 })(App);

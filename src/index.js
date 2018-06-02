@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import { createStore, applyMiddleware, compose } from "redux";
 import { Provider } from "react-redux";
 import thunk from "redux-thunk";
@@ -27,7 +28,12 @@ const store = createStore(
 
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+    <Router>
+      <div>
+        <Route exact path="/" component={App} />
+        <Route path="/:key" component={App} />
+      </div>
+    </Router>
   </Provider>,
   document.getElementById("root")
 );
