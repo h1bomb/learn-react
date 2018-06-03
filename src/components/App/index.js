@@ -1,23 +1,20 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import { Layout } from 'antd';
 import {
   DEFAULT_QUERY
 } from '../../constants';
 import {
   onDismiss,
   setSearchKey,
-  queryData,
-  addData,
-  setAddData,
-  sort
+  queryData
 } from "../../actions";
 import "./App.css";
-import { ButtonWithLoading } from "../Button";
 import Table from "../Table";
 import Form from "../Form";
 import Search from "../Search";
 
-let lastObjectId = 1;
+const { Content } = Layout;
 
 /**
  * app组件
@@ -28,54 +25,25 @@ class App extends Component {
     this.onSearchChange = this.onSearchChange.bind(this); // 搜索输入
     this.onSearchSubmit = this.onSearchSubmit.bind(this); // 搜索提交
     this.onDismiss = this.onDismiss.bind(this); // 移除一项
-    this.inputChange = this.inputChange.bind(this); // 添加输入
-    this.submit = this.submit.bind(this); // 添加提交
-    this.onSort = this.onSort.bind(this); // 排序
-    this.loadMore = this.loadMore.bind(this); // 加载更多
+    this.loadPage = this.loadPage.bind(this); // 加载更多
   }
-  onSort(sortKey) {
-    const { dispatch } = this.props;
-    dispatch(sort(sortKey));
-  }
+
 
   onSearchSubmit(event) {
     const { searchKey, dispatch } = this.props;
     this.props.history.push(`/${searchKey}`);
     dispatch(queryData(searchKey));
-    event.preventDefault();
   }
 
-  loadMore() {
-    const { dispatch, searchKey, page } = this.props;
-    dispatch(queryData(searchKey, page + 1));
+  loadPage(pagination) {
+    const { dispatch, searchKey} = this.props;
+    dispatch(queryData(searchKey, pagination.current));
   }
 
   componentDidMount() {
     const { key } = this.props.match.params;
     const { dispatch } = this.props;
     dispatch(queryData(key||DEFAULT_QUERY));
-  }
-  submit() {
-    const { dispatch, addedItem } = this.props;
-    if (
-      addedItem.title === "" ||
-      addedItem.author === "" ||
-      addedItem.url === ""
-    ) {
-      alert("please fill all fields!");
-      return;
-    }
-    lastObjectId++;
-    addedItem.objectID = lastObjectId;
-    dispatch(addData(addedItem));
-  }
-  inputChange(event) {
-    const { dispatch, addedItem } = this.props;
-    const target = event.target;
-    const changeProp = {
-      [target.name]: target.value
-    };
-    dispatch(setAddData({ ...addedItem, ...changeProp }));
   }
   onDismiss(id) {
     const { dispatch } = this.props;
@@ -88,15 +56,16 @@ class App extends Component {
   render() {
     const {
       error,
-      addedItem,
       isLoading,
-      sortKey,
-      isSortReverse,
       searchKey,
-      list
+      list,
+      pagination
     } = this.props;
     return (
-      <div className="page">
+
+      <Layout className="layout">
+      <Content style={{ padding: '0 50px' }}>
+      <div style={{ background: '#fff', padding: 24, marginTop: 50, minHeight: 280 }}>
         <div className="interactions">
           <Search
             value={searchKey}
@@ -114,24 +83,15 @@ class App extends Component {
           <Table
             list={list}
             onDismiss={this.onDismiss}
-            sortKey={sortKey}
-            isSortReverse={isSortReverse}
-            onSort={this.onSort}
+            isLoading={isLoading}
+            pagination={pagination}
+            onChange={this.loadPage}
           />
         )}
-        <div className="interactions">
-          <ButtonWithLoading isLoading={isLoading} onClick={this.loadMore}>
-            More
-          </ButtonWithLoading>
+        <Form />
         </div>
-        <Form
-          author={addedItem.author}
-          url={addedItem.url}
-          title={addedItem.title}
-          inputChange={this.inputChange}
-          submit={this.submit}
-        />
-      </div>
+        </Content>
+      </Layout>
     );
   }
 }

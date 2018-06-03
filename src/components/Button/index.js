@@ -1,13 +1,6 @@
 import React from "react";
+import { Button } from 'antd';
 
-/**
- * 按钮
- */
-const Button = ({ onClick, className = "", children }) => (
-  <button className={className} onClick={onClick} type="button">
-    {children}
-  </button>
-);
 
 /**
  * 加载中

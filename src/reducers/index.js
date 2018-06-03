@@ -3,15 +3,13 @@ import {
     SET_SEARCH_KEY,
     LOAD_DATA,
     ADD_DATA,
-    SET_ADD_DATA,
     LOADING,
-    SORT,
     ON_ERROR
 } from '../actions'
 
 import {
-    initAddItem,
-    DEFAULT_QUERY
+    DEFAULT_QUERY,
+    DEFAULT_HPP
 } from '../constants'
 
 const dismiss = (state, id) => {
@@ -30,12 +28,13 @@ const dismiss = (state, id) => {
 const rootReducer = (state = {
     list: [],
     searchKey: DEFAULT_QUERY,
-    page: 0,
-    addedItem: initAddItem,
     isLoading: false,
     error: null,
-    sortKey: "NONE",
-    isSortReverse: false,
+    pagination: {
+        pageSize: DEFAULT_HPP,
+        current: 1,
+        total: 0
+    }
 }, action) => {
     switch (action.type) {
         case ON_ERROR:
@@ -43,14 +42,6 @@ const rootReducer = (state = {
                 ...state,
                 error: action.error,
                 isLoading: false
-            }
-        case SORT:
-            const isSortReverse =
-                state.sortKey === action.key && !state.isSortReverse;
-            return {
-                ...state,
-                isSortReverse,
-                sortKey: action.key
             }
         case LOADING:
             return {
@@ -66,26 +57,20 @@ const rootReducer = (state = {
             };
         case LOAD_DATA:
             let list = action.json.hits;
-            if (action.json.page !== 1) {
-                list = [...state.list, ...list]
-            }
             return {
                 ...state,
                 list,
-                page: action.json.page,
+                pagination: {
+                    ...state.pagination,
+                    current: action.json.page,
+                    total: action.json.nbHits>1000? 900:action.json.nbHits
+                },
                 isLoading: false
             };
         case ADD_DATA:
             return {
                 ...state,
-                addedItem: { ...initAddItem
-                },
-                list: [...state.list, action.item]
-            }
-        case SET_ADD_DATA:
-            return {
-                ...state,
-                addedItem: action.item
+                list: [ action.item,...state.list ]
             }
         default:
             return state;
