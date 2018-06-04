@@ -53,7 +53,7 @@ class FormPanel extends Component {
     const { getFieldDecorator } = this.props.form;
 
     return (
-      <div>
+      <div style={{textAlign:'left'}}>
         <Button type="primary" onClick={this.show}>
           Add News
         </Button>
@@ -89,4 +89,4 @@ class FormPanel extends Component {
     );
   }
 }
-export default connect(state =>state)(Form.create()(FormPanel));
+export default connect()(Form.create()(FormPanel));

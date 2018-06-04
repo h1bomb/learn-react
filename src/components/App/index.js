@@ -11,7 +11,6 @@ import {
 } from "../../actions";
 import "./App.css";
 import Table from "../Table";
-import Form from "../Form";
 import Search from "../Search";
 
 const { Content } = Layout;
@@ -62,7 +61,6 @@ class App extends Component {
       pagination
     } = this.props;
     return (
-
       <Layout className="layout">
       <Content style={{ padding: '0 50px' }}>
       <div style={{ background: '#fff', padding: 24, marginTop: 50, minHeight: 280 }}>
@@ -88,7 +86,6 @@ class App extends Component {
             onChange={this.loadPage}
           />
         )}
-        <Form />
         </div>
         </Content>
       </Layout>
@@ -96,6 +93,4 @@ class App extends Component {
   }
 }
 
-export default connect(state => {
-  return state;
-})(App);
+export default connect(state => state)(App);
