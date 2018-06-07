@@ -12,6 +12,7 @@ import reducer from "./reducers";
 import ApolloClient from "apollo-boost";
 import gql from "graphql-tag";
 import { ApolloProvider,Query } from "react-apollo";
+import Dogs from "./components/App/Dogs";
 
 const middleware = [thunk];
 //使用 redux-devtools chrome插件
@@ -33,6 +34,7 @@ const store = createStore(
 );
 
 const ExchangeRates = () => (
+  <ApolloProvider client={client}>
   <Query
     query={gql`
       {
@@ -54,20 +56,21 @@ const ExchangeRates = () => (
       ));
     }}
   </Query>
+  </ApolloProvider>
 );
 
 ReactDOM.render(
-  <ApolloProvider client={client}>
+  
   <Provider store={store}>
     <Router>
       <Switch>
         <Route exact path="/graphql" component={ExchangeRates}/>
+        <Route path="/dogs" component={Dogs} />
         <Route exact path="/" component={App} />
         <Route path="/:key" component={App} />
       </Switch>
     </Router>
-  </Provider>
-  </ApolloProvider>,
+  </Provider>,
   document.getElementById("root")
 );
 registerServiceWorker();
