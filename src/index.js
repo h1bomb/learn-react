@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { Layout } from 'antd';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { createStore, applyMiddleware, compose } from "redux";
 import { Provider } from "react-redux";
@@ -13,7 +14,9 @@ import ApolloClient from "apollo-boost";
 import gql from "graphql-tag";
 import { ApolloProvider,Query } from "react-apollo";
 import Dogs from "./components/App/Dogs";
-
+import Todo from "./components/App/Todo";
+import Users from "./components/App/Users";
+const { Content } = Layout;
 const middleware = [thunk];
 //使用 redux-devtools chrome插件
 let composeEnhancers = compose;
@@ -63,12 +66,18 @@ ReactDOM.render(
   
   <Provider store={store}>
     <Router>
+    <Layout className="layout">
+      <Content style={{ background: '#fff', padding: 24, margin: 50, minHeight: 280 }}>
       <Switch>
+        <Route path="/users" component={Users} />
         <Route exact path="/graphql" component={ExchangeRates}/>
         <Route path="/dogs" component={Dogs} />
+        <Route path="/todo" component={Todo} />
         <Route exact path="/" component={App} />
         <Route path="/:key" component={App} />
       </Switch>
+      </Content>
+      </Layout>
     </Router>
   </Provider>,
   document.getElementById("root")

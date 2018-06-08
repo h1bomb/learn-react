@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { Layout } from 'antd';
 import {
   DEFAULT_QUERY
 } from '../../constants';
@@ -12,8 +11,6 @@ import {
 import "./App.css";
 import Table from "../Table";
 import Search from "../Search";
-
-const { Content } = Layout;
 
 /**
  * app组件
@@ -61,9 +58,7 @@ class App extends Component {
       pagination
     } = this.props;
     return (
-      <Layout className="layout">
-      <Content style={{ padding: '0 50px' }}>
-      <div style={{ background: '#fff', padding: 24, marginTop: 50, minHeight: 280 }}>
+      <div>
         <div className="interactions">
           <Search
             value={searchKey}
@@ -87,8 +82,6 @@ class App extends Component {
           />
         )}
         </div>
-        </Content>
-      </Layout>
     );
   }
 }
