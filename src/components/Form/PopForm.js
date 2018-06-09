@@ -58,7 +58,7 @@ class FormPanel extends Component {
           onOk={this.handleSubmit}
           onCancel={this.cancel}
         >
-         <Form layout="vertical">
+          <Form layout="vertical">
             {formSet.map(val => (
               <FormItem label={val.key} key={val.key}>
                 {getFieldDecorator(val.key, {
@@ -72,4 +72,17 @@ class FormPanel extends Component {
     );
   }
 }
-export default connect()(Form.create()(FormPanel));;
+export default connect()(
+  Form.create({
+    mapPropsToFields({data}) {
+     if(!data) {
+         return {nothing:Form.createFormField({value:''})};
+     }
+     let ret = {};
+     for(let key in data) {
+         ret[key] = Form.createFormField({value:data[key]});
+     }
+     return ret;
+    }
+  })(FormPanel)
+);

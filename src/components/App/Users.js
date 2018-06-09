@@ -36,6 +36,8 @@ const CREATE_USERS = gql`
   }
 `;
 
+
+
 const Loading = ({ loading, error }) => (
   <div>
     {loading && <Spin />}
@@ -43,7 +45,7 @@ const Loading = ({ loading, error }) => (
   </div>
 );
 
-const UserForm = ({ createUser }) => {
+const UserForm = ({ submit, user, action }) => {
   const formSet = [
     {
       key: "name",
@@ -75,15 +77,16 @@ const UserForm = ({ createUser }) => {
         }
       }
     };
-    createUser({ variables: prams });
+    submit({ variables: prams });
   };
   return (
     <Popform
       formSet={formSet}
-      buttonText="Add Users"
-      modalTitle="Add Users"
-      okText="Add"
+      buttonText={action}
+      modalTitle="Users"
+      okText="OK"
       dataProc={dataProc}
+      data={user}
     />
   );
 };
@@ -102,7 +105,7 @@ const CreateUser = () => {
     >
       {(createUser, { loading, error }) => (
         <div>
-          <UserForm createUser={createUser} />
+          <UserForm submit={createUser} action="Add User" />
           <Loading loading={loading} error={error} />
         </div>
       )}
@@ -113,7 +116,7 @@ const CreateUser = () => {
 const DeleteUser = prams => (
   <Mutation
     mutation={DELETE_USER}
-    update={(cache) => {
+    update={cache => {
       const { allUsers } = cache.readQuery({ query: GET_USERS });
       cache.writeQuery({
         query: GET_USERS,
@@ -123,7 +126,7 @@ const DeleteUser = prams => (
   >
     {(deleteUser, { loading, error }) => (
       <div>
-        <Button type="danger" onClick={()=>deleteUser({variables:prams})}>
+        <Button type="danger" onClick={() => deleteUser({ variables: prams })}>
           Delete
         </Button>
         <Loading loading={loading} error={error} />
@@ -131,6 +134,51 @@ const DeleteUser = prams => (
     )}
   </Mutation>
 );
+const UPDATE_USER = gql`
+  mutation updateUser($id: String!, $name: String!, $password: String!, $email: String!) {
+    updateUser(id:$id, name:$name, password:$password,email:$email){
+      id
+      name
+      email
+      password
+    }
+}
+`;
+const UpdateUser = ({ item }) => {
+  return (
+    <Mutation
+     mutation={UPDATE_USER}
+     update={(cache, { data: { updateUser }}) => {
+      const { allUsers } = cache.readQuery({ query: GET_USERS });
+      cache.writeQuery({
+        query: GET_USERS,
+        data: { allUsers: allUsers.map(val => {
+              if(val.id === updateUser.id) {
+                return updateUser;
+              } else {
+                return val;
+              }
+          }) 
+        }
+      });
+    }}
+     >
+    {(updateUser, { loading, error }) => (
+      <div>
+        <UserForm submit={({variables}) => {
+          updateUser({
+            variables:{
+              ...item,
+              name:variables.name,
+              ...variables.authProvider.email
+            }
+          });
+        }} action="Update" user={item} />
+        <Loading loading={loading} error={error} />
+      </div>
+    )}
+    </Mutation>);
+};
 
 const Users = () => (
   <Query query={GET_USERS}>
@@ -142,7 +190,12 @@ const Users = () => (
             itemLayout="horizontal"
             dataSource={data && data.allUsers}
             renderItem={item => (
-              <List.Item actions={[<DeleteUser id={item.id} />]}>
+              <List.Item
+                actions={[
+                  <DeleteUser id={item.id} />,
+                  <UpdateUser item={item} />
+                ]}
+              >
                 <List.Item.Meta title={item.name} description={item.email} />
                 {item.password}
               </List.Item>
@@ -154,7 +207,7 @@ const Users = () => (
   </Query>
 );
 
-const UsersPanel = ({ createUser }) => {
+const UsersPanel = () => {
   return (
     <ApolloProvider client={client}>
       <div>
